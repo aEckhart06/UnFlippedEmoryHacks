@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sign Up</title>
+        <!-- Add Firebase SDK -->
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+        
+        <style>
+            .container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+            }
+            .signup-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                height: 100%;
+                background-color: #f0f0f0;
+                font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+            }
+
+            .inner-signup-container {
+                display: inline-flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: space-around;
+                width: 40%;
+                height: 60%;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0px 0px 10px 0px #AA88FF;
+            }
+
+            .signup-container h1 {
+                font-size: 50px;
+                font-weight: bold;
+                margin-bottom: 20px;
+            }
+
+            .signup-form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                padding: 20px;
+                margin-bottom: 20px;
+                width: 80%;
+
+            }
+
+            .login-email {
+                width: 100%;
+                height: 40px;
+                border-radius: 5px;
+                border: none;
+            }   
+            .login-password {
+                width: 100%;
+                height: 40px;
+                border-radius: 5px;
+                border: none;
+            }
+
+            .signup-button {
+                height: 40px;
+                border-radius: 25px;
+                border: none;
+                background-color: #6952a2f3;
+                padding: 10px 30px;
+                color: white;
+            }
+            
+        </style>
+    </head>
+</html>
+
+<body>
+    <div class="container">
+        <div class="signup-container">
+            <div class= "inner-signup-container">
+                <h1>Sign Up</h1>
+                <button id="googleSignIn" class="google-login-button">Sign in with Google</button>
+                <div class="signup-form">
+                    <input type="text" id="email" class="login-email" placeholder="Email">
+                    <input type="password" id="password" class="login-password" placeholder="Password">
+                    <button id="emailSignIn" class="signup-button" type="submit">Sign Up</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        signupButton = document.getElementById('emailSignIn');
+        signupButton.addEventListener('click', () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({email, password})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/library';
+                }
+            })
+        })
+    </script>
+</body>

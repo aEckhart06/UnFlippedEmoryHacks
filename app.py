@@ -14,11 +14,16 @@ from Chat import call_model
 from Transcribe import transcribe
 from datetime import datetime
 import threading
+from GenerateQuestions import generate_mcq, ask_question, split_transcript_by_time
+from functools import wraps
+
+
 load_dotenv()
 
 app = Flask(__name__)
 
 client = MongoClient('localhost', 27017)
+
 
 # Our MongoDB Database
 db = client.flask_database
@@ -38,8 +43,11 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def index():
     return render_template('index.html')
 
-@app.route('/library', methods=['GET'])
+
+# Example protected route
+@app.route('/library')
 def library():
+    # Only authenticated users can access this route
     files = fs.find()
 
     video_list = []
@@ -70,7 +78,7 @@ def upload_file():
     filename = secure_filename(file.filename)
     # Save file to GridFS
     file_id = fs.put(file, filename=filename)
-
+    
     # Start transcription in a separate thread
     thread = threading.Thread(target=process_transcript, args=(file_id, filename))
     thread.daemon = True  # Thread will exit when main program exits
@@ -78,18 +86,31 @@ def upload_file():
     
     return redirect(url_for('library'))
 
-def process_transcript(file_id, filename):
+def process_transcript(file_id: ObjectId, filename: str):
     try:
-        audio_file = fs.get(file_id)
-        transcript = transcribe(audio_file)
+        grid_out = fs.get(file_id)
         
-        transcript_doc = {
-            'file_id': file_id,
-            'filename': filename,
-            'transcript': transcript,
-            'created_at': datetime.now()
-        }
-        transcript_collection.insert_one(transcript_doc)
+        # Create a temporary file
+        with tempfile.NamedTemporaryFile(suffix='.mp4', delete=False) as temp_file:
+            temp_file.write(grid_out.read())
+            temp_path = temp_file.name
+        
+        try:
+            # Pass the file path instead of the GridOut object
+            transcript = transcribe(temp_path)
+            
+            transcript_doc = {
+                'file_id': file_id,
+                'filename': filename,
+                'transcript': transcript,
+                'created_at': datetime.now()
+            }
+            transcript_collection.insert_one(transcript_doc)
+        finally:
+            # Clean up the temporary file
+            if os.path.exists(temp_path):
+                os.unlink(temp_path)
+                
     except Exception as e:
         print(f"Error processing transcript: {str(e)}")
 
@@ -202,6 +223,70 @@ def check_processing_status():
             completed_videos.append(str(file._id))
     
     return jsonify({'completed_videos': completed_videos})
+
+@app.route('/createQuestion', methods=['POST'])
+def createQuestion():
+    transcript = request.json['transcript']
+    current_timestamp = request.json['current_timestamp']
+    current_timestamp = float(current_timestamp)
+    interval = request.json['interval']
+    interval = float(interval)
+    interval_seconds = interval * 60
+    segments = split_transcript_by_time(transcript, interval_seconds)
+    if len(segments) > 0:
+        i = int(current_timestamp / (interval_seconds))
+        question_object = generate_mcq(segments[i])
+        print(question_object)
+    else:
+        question_object = None
+
+    return jsonify({'question_object': question_object})
+
+@app.route('/rename/<file_id>', methods=['POST'])
+def rename_file(file_id):
+    try:
+        # Get the new filename from the form submission
+        new_filename = request.form.get('new_filename')
+        
+        if not new_filename:
+            return jsonify({'error': 'No filename provided'}), 400
+        
+        # Secure the filename to prevent any security issues
+        new_filename = secure_filename(new_filename)
+        
+        # Add extension if it's missing (assuming mp4 as default)
+        if not new_filename.lower().endswith(('.mp4', '.avi', '.mov', '.wmv')):
+            new_filename += '.mp4'
+        
+        # Update filename in GridFS
+        # Note: GridFS doesn't allow direct updates, so we need to get the file
+        # and re-save it with the new filename
+        file_obj = fs.get(ObjectId(file_id))
+        old_file_data = file_obj.read()
+        
+        # Store old metadata
+        old_metadata = {}
+        for key in file_obj._file:
+            if key not in ['_id', 'filename', 'uploadDate']:
+                old_metadata[key] = file_obj._file[key]
+        
+        # Delete old file
+        fs.delete(ObjectId(file_id))
+        
+        # Create new file with same ID if possible, or get the new ID
+        new_file_id = fs.put(old_file_data, filename=new_filename, **old_metadata)
+        
+        # Update transcript collection if there's a transcript for this file
+        transcript_collection.update_one(
+            {'file_id': ObjectId(file_id)},
+            {'$set': {'file_id': new_file_id, 'filename': new_filename}}
+        )
+        
+        return redirect(url_for('library'))
+        
+    except Exception as e:
+        print(f"Error renaming file: {str(e)}")
+        return f'Error renaming file: {str(e)}', 500
 
 if __name__ == '__main__':
     app.run(debug=True)

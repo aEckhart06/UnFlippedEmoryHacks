@@ -1,0 +1,8 @@
+flask==2.0.1
+pymongo==4.3.3
+python-dotenv==0.21.0
+openai==1.1.1
+opencv-python==4.7.0.72
+numpy==1.24.2
+openai-whisper==20231117
+werkzeug==2.2.3 

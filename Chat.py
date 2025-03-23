@@ -20,6 +20,8 @@ def call_model(transcript,current_timestamp, question):
 
         Here is the question:
         {question}
+
+        In your response, do not acknowledge that you were given a timestamp or the transcript. Just answer the question as if you are the professor.
         """
     completion = client.chat.completions.create(
         model="gpt-4o",

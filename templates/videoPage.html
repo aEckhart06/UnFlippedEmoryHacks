@@ -52,6 +52,7 @@
                 display: flex;
                 flex: 2;
                 flex-direction: column;
+                justify-content: space-between;
                 margin: 20px 20px 20px 0px;
                 
             }
@@ -125,25 +126,10 @@
                 font-size: 16px;
                 font-family: Arial, Helvetica, sans-serif;
             }
-            .chat-bubble::after {
-                content: "";
-                position: absolute;
-                /*bottom: -25px; /* Adjusts the position */
-                left: 20px;
-                border-width: 15px;
-                border-style: solid;
-                border-color: transparent transparent transparent transparent;
-            }
 
             .chat-bubble.active {
                 background-color: white;
                 
-            }
-            
-            /* This will automatically apply to the ::after when the parent has the 'active' class */
-            .chat-bubble.active::after {
-                border-color: white transparent transparent transparent;
-                bottom: -25px; /* Adjusts the position */
             }
             
             .teacher-avatar {
@@ -170,6 +156,70 @@
                 align-items: center;
                 width: 100%;
             }
+
+            /* Modal styles */
+            #question-modal {
+                display: none;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+
+            .question-modal-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                background-color: #ffffff;
+                margin: 5% auto;
+                padding: 40px;
+                width: 70%;
+                max-width: 500px;
+                border-radius: 5px;
+            }
+
+            #question-choices {
+                display: flex;
+                flex-direction: column;
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            #question-choices button {
+                margin: 5px 0;
+                padding: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                background-color: #f8f8f8;
+                cursor: pointer;
+                text-align: left;
+            }
+
+            #question-choices button:hover {
+                background-color: #e0e0e0;
+            }
+
+            #question-text {
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 15px;
+            }
+
+            #close-modal {
+                margin-top: 20px;
+                padding: 8px 15px;
+                border: none;
+                border-radius: 5px;
+                background-color: #4CAF50;
+                color: white;
+                cursor: pointer;
+            }
+
         </style>
     </head>
 </html>
@@ -205,6 +255,20 @@
         </div>
         
     </div>
+    <div id="question-modal" style="display: none;">
+        <div class="question-modal-content">
+            <p id="question-text"></p>
+            <div id="question-choices">
+                <button id="choice-a"></button>
+                <button id="choice-b"></button>
+                <button id="choice-c"></button>
+                <button id="choice-d"></button>
+            </div>
+            <p id="question-explanation" style="display: none;"></p>
+            <button id="close-modal" style="display: none;">Close</button>
+        </div>
+    </div>
+    <input type="hidden" id="transcript-data" value="{{ transcript }}">
     <script>
         function loadVideo(file) {
             const videoContainer = document.getElementById('video');
@@ -218,7 +282,7 @@
             const prompt = document.getElementById('prompt').value;
             document.getElementById('prompt').value = '';
             const current_timestamp = document.getElementById('video').currentTime;
-            const transcript = document.getElementById('video').textContent;
+            const transcript = document.getElementById('transcript-data').value;
             fetch('/submitPrompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -235,5 +299,113 @@
             })
                 
         }
+        function check_answer(question_object, choice) {
+            if (choice === question_object.answer) {
+                document.getElementById('choice-' + choice).style.backgroundColor = 'green';
+                document.getElementById('close-modal').addEventListener('click', close_modal);
+                document.getElementById('close-modal').style.display = 'block';
+                
+                
+            } else {
+                document.getElementById('choice-' + choice).style.backgroundColor = 'red';
+                document.getElementById('question-explanation').innerHTML = question_object.explanation;
+                document.getElementById('question-explanation').style.display = 'block';
+                document.getElementById('close-modal').addEventListener('click', close_modal);
+                document.getElementById('close-modal').style.display = 'block';
+
+            }
+        }
+
+        function close_modal() {
+            document.getElementById('question-modal').style.display = 'none';
+            document.getElementById('question-explanation').style.display = 'none';
+            document.getElementById('close-modal').style.display = 'none';
+            document.getElementById('choice-a').innerHTML = '';
+            document.getElementById('choice-b').innerHTML = '';
+            document.getElementById('choice-c').innerHTML = '';
+            document.getElementById('choice-d').innerHTML = '';
+            document.getElementById('choice-a').style.backgroundColor = 'transparent';
+            document.getElementById('choice-b').style.backgroundColor = 'transparent';
+            document.getElementById('choice-c').style.backgroundColor = 'transparent';
+            document.getElementById('choice-d').style.backgroundColor = 'transparent';
+            document.getElementById('video').play();
+
+        }
+
+        function open_question_modal(question_object) {
+            const question_modal = document.getElementById('question-modal');
+            question_modal.style.display = 'block';
+            const video = document.getElementById('video');
+            video.pause();
+            document.getElementById('question-text').innerHTML = question_object.question;
+            document.getElementById('choice-a').innerHTML = question_object.choices.a;
+            document.getElementById('choice-b').innerHTML = question_object.choices.b;
+            document.getElementById('choice-c').innerHTML = question_object.choices.c;
+            document.getElementById('choice-d').innerHTML = question_object.choices.d;
+
+            document.getElementById('choice-a').addEventListener('click', function() {
+                check_answer(question_object, 'a');
+            });
+            document.getElementById('choice-b').addEventListener('click', function() {
+                check_answer(question_object, 'b');
+            });
+            document.getElementById('choice-c').addEventListener('click', function() {
+                check_answer(question_object, 'c');
+            });
+            document.getElementById('choice-d').addEventListener('click', function() {
+                check_answer(question_object, 'd');
+            });
+        }
+
+        function ask_question(interval) {
+            const current_timestamp = document.getElementById('video').currentTime;
+            const transcript = document.getElementById('transcript-data').value;
+            fetch('/createQuestion', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({transcript: transcript, current_timestamp: current_timestamp.toFixed(2), interval: interval }) // Send JSON data
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log("Raw data:", data);
+                console.log("Question data:", data.question_object);
+                if (data.question_object.question !== "Sorry, I couldn't generate a question at this time.") {
+                // Add a try-catch block to handle parsing errors
+                    try {
+                        const question_object = typeof data.question_object === 'string' 
+                            ? JSON.parse(data.question_object) 
+                            : data.question_object;
+                            
+                        console.log("Parsed question object:", question_object);
+                        open_question_modal(question_object);
+                    } catch (error) {
+                            console.error("JSON parsing error:", error);
+                            console.log("JSON content that failed to parse:", data.question_object);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+        }
+
+        // Move these variables outside the event listener to maintain their values between events
+        let num_questions_asked = 0;
+        const interval = 1.5; // Interval is every 2 minutes
+        let lastQuestionTime = 0;
+
+        const video = document.getElementById('video');
+        video.addEventListener('timeupdate', function() {
+            const current_timestamp = video.currentTime;
+            const minutesMark = (num_questions_asked + 1) * 60 * interval;
+            
+            // Check if we've reached the next interval and haven't asked a question recently
+            if (current_timestamp >= minutesMark && current_timestamp - lastQuestionTime > 5) {
+                ask_question(interval);
+                num_questions_asked++;
+                lastQuestionTime = current_timestamp;
+                console.log("Question asked at timestamp: " + current_timestamp);
+            }
+        });
     </script>
 </body>

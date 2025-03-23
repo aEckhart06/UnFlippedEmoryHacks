@@ -6,6 +6,9 @@
         <title>Library</title>
         <!--<link rel="stylesheet" href="static/library.css"-->
         <style>
+            html, body {
+                overflow-x: hidden;
+            }
             body {
                 margin: 0px;
                 background: #181818;
@@ -200,8 +203,8 @@
             }
             
             .video-item {
-                width: 150px;
-                height: 125px;
+                width: 250px;
+                height: 200px;
                 border-radius: 5px;
                 border: 1px solid white;
                 padding: 10px;
@@ -222,20 +225,20 @@
 
             .video-thumbnail {
                 width: 100%;
-                height: 80px;
+                height: 160px;
                 object-fit: cover;
                 margin-bottom: 5px;
                 background-color: #f0f0f0; /* Light gray background while loading */
             }
 
             .video-filename {
-                font-size: 12px;
+                font-size: 18px;
                 margin: 0;
                 text-align: center;
-                overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
                 color: white;
+                font-family: 'Montserrat', sans-serif;
             }
 
             .video-options-modal {
@@ -331,6 +334,32 @@
                 position: relative;
             }
 
+            /* Rename modal styles */
+            #renameForm {
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-top: 15px;
+            }
+
+            #newFileName {
+                padding: 10px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                font-size: 16px;
+                width: 100%;
+            }
+
+            .rename-button {
+                background-color: #4a86e8;
+                color: white;
+            }
+
+            .rename-button:hover {
+                background-color: #3a76d8;
+            }
+
         </style>
     </head>
 </html> 
@@ -372,7 +401,20 @@
             <form action="" method="POST" id="deleteForm" style="display: inline;">
                 <button type="submit" class="option-button delete-button" onclick="return confirm('Are you sure you want to delete this video?')">Delete</button>
             </form>
+            <button class="option-button rename-button" onclick="openRenameModal()">Rename</button>
             <p id="selectedVideoId" style="margin-top: 10px; color: transparent; font-size: 12px;"></p>
+        </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div id="renameModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeRenameModal()">&times;</span>
+            <h3>Rename Video</h3>
+            <form action="" method="POST" id="renameForm">
+                <input type="text" id="newFileName" name="new_filename" placeholder="Enter new name" required>
+                <button type="submit" class="submit-button active">Save</button>
+            </form>
         </div>
     </div>
 
@@ -410,6 +452,23 @@
 
         let selectedVideoId = '';
         let selectedVideoName = '';
+        
+        let renameModal = document.getElementById('renameModal');   
+
+        function openRenameModal() {
+            document.getElementById('videoOptionsModal').style.display = 'none';
+            document.getElementById('renameForm').action = `/rename/${selectedVideoId}`;
+            
+            // Pre-fill with current name without extension
+            let nameWithoutExt = selectedVideoName.replace(/\.[^/.]+$/, "");
+            document.getElementById('newFileName').value = nameWithoutExt;
+            
+            document.getElementById('renameModal').style.display = 'block';
+        }
+
+        function closeRenameModal() {
+            document.getElementById('renameModal').style.display = 'none';
+        }
 
         function openVideoOptions(fileId, fileName) {
             selectedVideoId = fileId;
@@ -435,11 +494,16 @@
         window.onclick = function(event) {
             const uploadModal = document.getElementById("myModal");
             const optionsModal = document.getElementById("videoOptionsModal");
+            const renameModal = document.getElementById("renameModal");
+            
             if (event.target == uploadModal) {
                 uploadModal.style.display = "none";
             }
             if (event.target == optionsModal) {
                 optionsModal.style.display = "none";
+            }
+            if (event.target == renameModal) {
+                renameModal.style.display = "none";
             }
         }
 
@@ -489,7 +553,7 @@
         // Handle form submission
         document.getElementById('submitButton').addEventListener('click', submitVideo);
 
-        // Check processing status every 5 seconds
+        // Check processing status every 30 seconds
         function checkProcessingStatus() {
             const processingItems = document.querySelectorAll('.video-item.processing');
             if (processingItems.length > 0) {
@@ -505,7 +569,7 @@
 
         // Start checking if there are any processing items
         if (document.querySelector('.processing')) {
-            setInterval(checkProcessingStatus, 5000);
+            setInterval(checkProcessingStatus, 30000);
         }
     </script>
 </body>

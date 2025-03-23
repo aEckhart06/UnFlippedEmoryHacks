@@ -6,6 +6,9 @@
     <title>UnFlipped</title>
     <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
     <style>
+        html, body {
+            overflow-x: hidden;
+        }
         body {
             background: black;
             margin: 0;
@@ -43,7 +46,7 @@
         .login-button {
             all: unset;
             box-sizing: border-box;
-            display: flex;
+            display: none;
             width: 100px;
             height: 42px;
             align-items: center;
@@ -141,6 +144,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
         }
 
         .content-title {
@@ -186,6 +190,48 @@
 
         }
 
+        #ansq {
+            position: absolute;
+            top: 100%;
+            left: 55%;
+            transform: rotate(-8.69deg);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 1px #ffffff, 0 0 10px #AA88FF;
+            background-color: #181818;
+            padding: 10px;
+            border-radius: 10px;
+        }
+        #cstqz {
+            position: absolute;
+            top: 120%;
+            left: 44%;
+            transform: rotate(7.69deg);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 1px #ffffff, 0 0 10px #AA88FF;
+            background-color: #181818;
+            padding: 10px;
+            border-radius: 10px;
+            
+        }
+        #pwdai {
+            position: absolute;
+            top: 103%;
+            left: 30%;
+            transform: rotate(-6.69deg);
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 1px #ffffff, 0 0 10px #AA88FF;
+            background-color: #181818;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+
         
         
     </style>
@@ -199,12 +245,15 @@
         </div>
         <div class="content">
             <p class="content-title">UnFlipped</p>
-            <div class="content-mission">Our mission is to make learning interactive by unflipping the flipped classroom, letting students engage with AI for real-time answers and deeper understanding.</div>
+            <div class="content-mission">Making learning interactive by unflipping the flipped classroom.<br> Letting students engage with AI-driven educational resources allows for real-time answers and a deeper understanding outside of the classroom.</div>
             <button class="get-started-button" onclick="window.location.href='/library';">
                 <div class="text-wrapper">
                     Get Started
                 </div>
             </button>
+            <p id="ansq">Answers your questions</p>
+            <p id="cstqz">Customized Quizzes</p>
+            <p id="pwdai">FullyPowered by AI</p>
         </div>
         <div class="ion-book">
             <img class="vector" src="https://raw.githubusercontent.com/aEckhart06/UnFlippedEmoryHacks/main/vector.png"/>
