@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Library</title>
+        <!--<link rel="stylesheet" href="static/library.css"-->
+        <style>
+            body {
+                margin: 0px;
+                background: #181818;
+                min-height: 100vh;
+
+            }
+
+            .container {
+                margin: 0px;
+            }
+
+            .logo {
+                height: 80px;
+                display: flex;
+                justify-content: flex-end;
+                padding: 20px 40px 0px 40px;
+                align-items: center;
+                font-family: 'Montserrat', sans-serif;
+            }
+            .logo h1 {
+                font-weight: bold;
+                color: white;
+                text-shadow: 0 0 2px #d4d4d4;
+                padding: 10px 20px;
+            }
+            .logo h1:hover {
+                transform: scale(1.02);
+                text-shadow: 0 2px 5px rgba(255, 255, 255, 0.707);
+            }
+
+            .header {
+                display: inline-flex;
+                align-items: center;
+                width: 100%;
+                padding: 0px 40px 20px 40px;
+                margin: 0px;
+                box-sizing: border-box;
+            }
+
+            .header-title {
+                font-size: 45px;
+                font-weight: bold;
+                font-family: 'Montserrat', sans-serif;
+                color: white;
+                text-shadow: 0 0 1px #d4d4d4;
+            }
+
+            .upload {
+                background: #181818;
+                color: #e0e0e0;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                border: 1px solid #d4d4d4;
+                margin: 10px;
+                margin-left: 50px;
+                font-family: 'Montserrat', sans-serif;
+                font-weight: bold;
+            }
+
+            .upload:hover {
+                background: #333333;
+            }
+
+            input[type="file"] {
+                display: none;
+            }
+
+            .file-upload-label {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                padding: 5px 10px;
+                border-radius: 5px;
+                transform: translate(-50%, -50%);
+                z-index: 5;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+
+            .file-upload-label:hover {
+                background: #333333;
+                color: #ffffff;
+            }
+
+            /* Modal styles */
+            .modal {
+                display: none;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+
+            .modal-content {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                background-color: #ffffff;
+                margin: 5% auto;
+                padding: 40px;
+                width: 70%;
+                max-width: 500px;
+                border-radius: 5px;
+            }
+
+            .close-button {
+                position: absolute;
+                right: 10px;
+                top: 5px;
+                font-size: 24px;
+                font-weight: bold;
+                cursor: pointer;
+                color: #666;
+            }
+
+            .close-button:hover {
+                color: #000;
+            }
+
+            .popup-button:hover {
+                background: #333333;
+            }
+
+            .modal-content-upload {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                width: 90%;
+                margin: 0;
+                padding: 40px;
+                background-color: #e0e0e0;
+                border: 2px dashed #000000;
+                border-radius: 5px;
+                position: relative;
+            }
+
+            .modal-content-upload form {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+                width: 100%;
+                height: 100%;
+            }
+
+            #videoPreview {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: none;
+                border-radius: 5px;
+            }
+
+            .preview-container {
+                width: 100%;
+                height: 300px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .submit-button {
+                background: #90EE90;
+                color: #ffffff;
+                padding: 10px 20px;
+                border-radius: 5px;
+                cursor: pointer;
+                border: none;
+                margin-top: 20px;
+                transition: background-color 0.3s ease;
+            }
+
+            .submit-button.active {
+                background: #32CD32;
+            }
+
+            .submit-button:hover {
+                opacity: 0.9;
+            }
+
+            .video-list {
+                display: flex;
+                flex-wrap: wrap;
+                padding-left: 40px;
+                padding-right: 40px;
+            }
+            
+            .video-item {
+                width: 150px;
+                height: 125px;
+                border-radius: 5px;
+                border: 1px solid white;
+                padding: 10px;
+                margin: 10px;
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                cursor: pointer;
+                transition: transform 0.2s;
+                overflow: hidden;
+            }
+
+            .video-item:hover {
+                transform: scale(1.02);
+                box-shadow: 0 2px 5px rgba(255, 255, 255, 0.2);
+            }
+
+            .video-thumbnail {
+                width: 100%;
+                height: 80px;
+                object-fit: cover;
+                margin-bottom: 5px;
+                background-color: #f0f0f0; /* Light gray background while loading */
+            }
+
+            .video-filename {
+                font-size: 12px;
+                margin: 0;
+                text-align: center;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: white;
+            }
+
+            .video-options-modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 1000;
+            }
+
+            .video-options-content {
+                position: relative;
+                background-color: #ffffff;
+                margin: 15% auto;
+                padding: 20px;
+                width: 300px;
+                border-radius: 5px;
+                text-align: center;
+            }
+
+            .option-button {
+                display: block;
+                width: 100%;
+                padding: 10px;
+                margin: 10px 0;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: background-color 0.3s;
+            }
+
+            .open-button {
+                background-color: #4CAF50;
+                color: white;
+            }
+
+            .open-button:hover {
+                background-color: #45a049;
+            }
+
+            .delete-button {
+                background-color: #ff4444;
+                color: white;
+            }
+
+            .delete-button:hover {
+                background-color: #cc0000;
+            }
+
+            .close-options {
+                position: absolute;
+                right: 10px;
+                top: 5px;
+                font-size: 24px;
+                font-weight: bold;
+                cursor: pointer;
+                color: #666;
+            }
+
+            .close-options:hover {
+                color: #000;
+            }
+
+            .video-info {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .processing-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-size: 14px;
+                border-radius: 5px;
+            }
+
+            .video-item.processing {
+                cursor: not-allowed;
+                opacity: 0.7;
+                position: relative;
+            }
+
+        </style>
+    </head>
+</html> 
+<body>
+    <div class="container">
+        <label class="logo" onclick="window.location.href='/';">
+            <h1>UnFlipped</h1>
+        </label>
+        <div class="header">
+            <h1 class="header-title">Library</h1>
+            <button class="upload" onclick="openModal()">Upload</button>
+        </div>
+        <div class="video-list">
+            {% for video in video_list %}
+                <div class="video-item {% if not video.transcript_ready %}processing{% endif %}"
+                     {% if video.transcript_ready %}
+                     onclick="openVideoOptions('{{ video.file_id }}', '{{ video.filename }}')"
+                     {% endif %}
+                     title="{{ 'Processing transcript...' if not video.transcript_ready else video.filename }}">
+                    <img src="{{ url_for('get_first_frame', file_id=video.file_id) }}" 
+                         alt="Video thumbnail" 
+                         class="video-thumbnail"
+                         onerror="this.onerror=null; this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjgwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNlZWUiLz48dGV4dCB4PSI1MCUiIHk9IjUwJSIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+TG9hZGluZy4uLjwvdGV4dD48L3N2Zz4=';">
+                    <p class="video-filename">{{ video.filename }}</p>
+                    {% if not video.transcript_ready %}
+                        <div class="processing-overlay">Processing...</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Video Options Modal -->
+    <div id="videoOptionsModal" class="video-options-modal">
+        <div class="video-options-content">
+            <span class="close-options" onclick="closeVideoOptions()">&times;</span>
+            <h3 id="selectedVideoName"></h3>
+            <button class="option-button open-button" onclick="openVideo()">Open</button>
+            <form action="" method="POST" id="deleteForm" style="display: inline;">
+                <button type="submit" class="option-button delete-button" onclick="return confirm('Are you sure you want to delete this video?')">Delete</button>
+            </form>
+            <p id="selectedVideoId" style="margin-top: 10px; color: transparent; font-size: 12px;"></p>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div id="uploadBox"class="modal-content-upload">
+                <form action="/upload" method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <label id="uploadButton" class="file-upload-label">
+                        Upload Video
+                        <input type="file" name="file" accept=".mp4" id="videoInput">
+                    </label>
+                    <div class="preview-container">
+                        <video id="videoPreview" controls>
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </form>
+            </div>
+            <button type="submit" class="submit-button" id="submitButton" disabled>Submit</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const images = document.querySelectorAll('.video-thumbnail');
+            images.forEach(img => {
+                img.addEventListener('error', function(e) {
+                    console.error('Error loading image:', e);
+                    console.error('Image source:', img.src);
+                });
+            });
+        });
+
+        let selectedVideoId = '';
+        let selectedVideoName = '';
+
+        function openVideoOptions(fileId, fileName) {
+            selectedVideoId = fileId;
+            selectedVideoName = fileName;
+            document.getElementById('selectedVideoName').textContent = fileName;
+            document.getElementById('selectedVideoId').textContent = `Video ID: ${fileId}`;
+            document.getElementById('deleteForm').action = `/delete/${fileId}`;
+            document.getElementById('videoOptionsModal').style.display = 'block';
+        }
+
+        function closeVideoOptions() {
+            document.getElementById('videoOptionsModal').style.display = 'none';
+        }
+
+        function openVideo() {
+            const videoId = selectedVideoId;
+            if (videoId) {
+                window.location.href = `{{ url_for('videoPage', file_id='') }}${videoId}`;
+            }
+        }
+
+        // Close video options modal when clicking outside
+        window.onclick = function(event) {
+            const uploadModal = document.getElementById("myModal");
+            const optionsModal = document.getElementById("videoOptionsModal");
+            if (event.target == uploadModal) {
+                uploadModal.style.display = "none";
+            }
+            if (event.target == optionsModal) {
+                optionsModal.style.display = "none";
+            }
+        }
+
+        function openModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        function closeModal() {
+            const videoPreview = document.getElementById('videoPreview');
+            if (videoPreview.src) {
+                URL.revokeObjectURL(videoPreview.src);
+            }
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        function submitVideo() {
+            document.getElementById('uploadForm').submit();
+            
+        }
+
+        // Handle file input change
+        document.getElementById('videoInput').addEventListener('change', function(e) {
+            const submitButton = document.getElementById('submitButton');
+            const uploadButton = document.getElementById('uploadButton');
+            const videoPreview = document.getElementById('videoPreview');
+            const uploadBox = document.getElementById('uploadBox');
+            const uploadForm = document.getElementById('uploadForm');
+            
+            if (e.target.files.length > 0) {
+                const file = e.target.files[0];
+                const videoUrl = URL.createObjectURL(file);
+                videoPreview.src = videoUrl;
+                videoPreview.style.display = 'block';
+                submitButton.disabled = false;
+                submitButton.classList.add('active');
+                uploadButton.style.display = 'none';
+                uploadBox.style.padding = '20px';
+            } else {
+                videoPreview.style.display = 'none';
+                videoPreview.src = '';
+                submitButton.disabled = true;
+                submitButton.classList.remove('active');
+                uploadButton.style.display = 'block';
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('submitButton').addEventListener('click', submitVideo);
+
+        // Check processing status every 5 seconds
+        function checkProcessingStatus() {
+            const processingItems = document.querySelectorAll('.video-item.processing');
+            if (processingItems.length > 0) {
+                fetch('/check_processing_status')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.completed_videos.length > 0) {
+                            location.reload();  // Refresh page when new videos are ready
+                        }
+                    });
+            }
+        }
+
+        // Start checking if there are any processing items
+        if (document.querySelector('.processing')) {
+            setInterval(checkProcessingStatus, 5000);
+        }
+    </script>
+</body>
+</html>

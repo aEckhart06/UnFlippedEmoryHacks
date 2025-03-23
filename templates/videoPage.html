@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Video Page</title>
+        <style>
+            body {
+                margin: 0px;
+                background: #181818;
+                min-height: 100vh;
+            }
+
+            .logo {
+                height: 80px;
+                display: flex;
+                justify-content: flex-end;
+                padding: 20px 40px 0px 40px;
+                align-items: center;
+                font-family: 'Montserrat', sans-serif;
+            }
+            .logo h1 {
+                font-weight: bold;
+                color: white;
+                text-shadow: 0 0 2px #d4d4d4;
+                padding: 10px 20px;
+            }
+            .logo h1:hover {
+                transform: scale(1.02);
+                text-shadow: 0 2px 5px rgba(255, 255, 255, 0.707);
+            }
+
+            .content {
+                display: flex;
+                height: 80vh;
+                flex-direction: row;
+                align-items: stretch;
+                border-radius: 5px;
+                margin: 20px;
+            }
+
+            .chat-container {
+                padding: 20px;
+                flex: 1;
+                border-radius: 5px;
+                margin: 20px;
+                box-shadow: 0px 0px 10px 0px #AA88FF;
+                position: relative;
+            }
+
+            .video-chat-container {
+                display: flex;
+                flex: 2;
+                flex-direction: column;
+                margin: 20px 20px 20px 0px;
+                
+            }
+
+            .video-container {
+                display: flex;
+                border-radius: 5px;
+                margin: 0px;
+                background-color: #181818;
+                flex: 9;
+                position: relative;
+                overflow: hidden;
+            }
+
+            .prompt-container {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 5px;
+                border-radius: 35px;
+                margin: 20px;
+                background-color: #d4d4d4;
+                box-shadow: 0px 0px 2px 0px #d4d4d4;
+                flex: 1;
+            }
+            #video {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+            }
+
+            #prompt {
+                background: transparent;
+                color: black; /* Text color */
+                padding: 10px;
+                font-size: 16px;
+                border: none;
+                flex: 9;
+                outline: none;
+            }
+
+            #submit {
+                background: transparent;
+                border: 1px solid black;
+                cursor: pointer;
+                border-radius: 50%;
+                padding: 5px;
+                width: 7vh;
+                height: 7vh;
+            }
+
+            #submit:hover {
+                background: rgba(255, 255, 255, 0.8);
+            }
+            .chat-bubble {
+                display: inline-block;
+                position: relative;
+                background-color: transparent;
+                color: black;
+                margin: 5px;
+                padding: 15px;
+                border-radius: 10px;
+                max-width: 300px;
+                max-height: 150px;
+                overflow-y: auto;
+                word-wrap: break-word;
+                text-align: left;
+                font-size: 16px;
+                font-family: Arial, Helvetica, sans-serif;
+            }
+            .chat-bubble::after {
+                content: "";
+                position: absolute;
+                /*bottom: -25px; /* Adjusts the position */
+                left: 20px;
+                border-width: 15px;
+                border-style: solid;
+                border-color: transparent transparent transparent transparent;
+            }
+
+            .chat-bubble.active {
+                background-color: white;
+                
+            }
+            
+            /* This will automatically apply to the ::after when the parent has the 'active' class */
+            .chat-bubble.active::after {
+                border-color: white transparent transparent transparent;
+                bottom: -25px; /* Adjusts the position */
+            }
+            
+            .teacher-avatar {
+                width: 40vh;
+                height: 40vh;
+                position: absolute;
+                bottom: 0;
+                left: -20px;
+            }
+
+            .video-container::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 40px;
+                z-index: 0;
+                pointer-events: none;
+            }
+            .container {
+                display: inline-flex;
+                justify-content: space-between;
+                align-items: center;
+                width: 100%;
+            }
+        </style>
+    </head>
+</html>
+
+<body>
+    <div class="container">
+        <label class="logo" onclick="window.location.href='/library';">
+            <h1> < Library</h1>
+        </label>
+        <label class="logo" onclick="window.location.href='/';">
+            <h1>UnFlipped</h1>
+        </label>
+    </div>
+    <div class="content">
+        <div class="chat-container">
+            <p class="chat-bubble"></p>
+            <img src="https://raw.githubusercontent.com/aEckhart06/UnFlippedEmoryHacks/main/unflipper-teacher-removebg.png"  class="teacher-avatar" alt="Teacher Avatar">
+        </div>
+        <div class="video-chat-container">
+            <div class="video-container">
+                <video id="video" src="{{ video_url }}" type="video/mp4" controls>
+                    {{ transcript }}
+                </video>
+            </div>
+            <div class="prompt-container">
+                <input type="text" id="prompt" placeholder="Ask your professor...">
+                <button id="submit" onclick="submitPrompt()">
+                    <svg width="5vh" height="5vh" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 19V5M5 12L12 5L19 12" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+    </div>
+    <script>
+        function loadVideo(file) {
+            const videoContainer = document.getElementById('video');
+            videoUrl = URL.createObjectURL(file)
+            videoContainer.src = videoUrl
+            videoContainer.style.display = 'block';
+        }
+
+        function submitPrompt() {
+            console.log("Submit Prompt")
+            const prompt = document.getElementById('prompt').value;
+            document.getElementById('prompt').value = '';
+            const current_timestamp = document.getElementById('video').currentTime;
+            const transcript = document.getElementById('video').textContent;
+            fetch('/submitPrompt', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({transcript: transcript, current_timestamp: current_timestamp.toFixed(2), prompt: prompt }) // Send JSON data
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.querySelector('.chat-bubble').innerHTML = data.response;
+                document.querySelector('.chat-bubble').classList.add('active');
+                console.log(data.response);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            })
+                
+        }
+    </script>
+</body>

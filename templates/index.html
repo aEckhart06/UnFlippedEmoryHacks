@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnFlipped</title>
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"> -->
+    <style>
+        body {
+            background: black;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 100%;
+            padding: 20px 40px;
+            margin: 0px;
+            box-sizing: border-box;
+        }
+        .title {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+        }
+
+        .header-buttons {
+            height: 80px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .login-button {
+            all: unset;
+            box-sizing: border-box;
+            display: flex;
+            width: 100px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            position: relative;
+            background-color: #6952a2f3;
+            border-radius: 40px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            font-family: "Montserrat-Bold", Helvetica;
+            font-weight: bold;
+            color: white;
+            border: 1px solid white;
+        }   
+        .get-started-button {
+            all: unset;
+            box-sizing: border-box;
+            display: flex;
+            width: 148px;
+            height: 42px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 20px;
+            position: relative;
+            background-color: #6952a2f3;
+            border-radius: 40px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .get-started-button::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            z-index: -1;
+            background: linear-gradient(45deg, black, white, #AA88FF, white, black);
+            background-size: 400% 400%;
+            border-radius: 40px;
+            animation: border-animation 3s ease infinite;
+        }
+        
+        .get-started-button::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background-color: #6952a2f3;
+            border-radius: 38px;
+            z-index: -1;
+        }
+
+        @keyframes border-animation {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .get-started-button:hover::before {
+            animation-duration: 1s;
+        }
+
+        .get-started-button .text-wrapper {
+            position: relative;
+            width: fit-content;
+            margin-top: -2.00px;
+            font-family: "Montserrat-Bold", Helvetica;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 18px;
+            text-align: center;
+            letter-spacing: 0;
+            line-height: normal;
+        }
+
+        .content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content-title {
+            width: 100%;
+            text-align: center;
+            font-size: 75px;
+            font-weight: bold;
+            margin: 0px;
+            font-family: 'Montserrat', sans-serif;
+            padding: 40px;
+            color: white;
+            text-shadow: 0 0 5px #ffffff, 0 0 20px #AA88FF;
+        }
+
+        .content-mission {
+            width: 660px;
+            text-align: center;
+            font-size: 18px;
+            margin: 10px;
+            font-family: 'Montserrat', sans-serif;
+            color: white;
+            line-height: 1.5;
+            text-shadow: 0 0 5px #626262;
+        }
+
+        .ion-book {
+            position: relative;
+            width: 70%;
+            max-width: 1067px;
+            height: auto;
+            z-index: -1;
+            margin: 30px;
+
+        }
+
+        .ion-book .vector {
+            position: absolute;
+            width: 100%;
+            height: auto;
+            top: -400px;
+            left: 0;
+            opacity: 0.4;
+
+        }
+
+        
+        
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-buttons">
+                <button class="login-button">Login</button>
+            </div>
+        </div>
+        <div class="content">
+            <p class="content-title">UnFlipped</p>
+            <div class="content-mission">Our mission is to make learning interactive by unflipping the flipped classroom, letting students engage with AI for real-time answers and deeper understanding.</div>
+            <button class="get-started-button" onclick="window.location.href='/library';">
+                <div class="text-wrapper">
+                    Get Started
+                </div>
+            </button>
+        </div>
+        <div class="ion-book">
+            <img class="vector" src="https://raw.githubusercontent.com/aEckhart06/UnFlippedEmoryHacks/main/vector.png"/>
+        </div>
+    </div>
+</body>
+<script>    
+    
+</script>
+</html>
