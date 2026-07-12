@@ -3,7 +3,7 @@
 
 ---
 
-## Introduction / Executive Summary
+## Introduction
 
 ### The Problem
 In a "flipped classroom" model, students watch lecture videos on their own time and work through problems in class. It's an effective model on paper, but it breaks down in one specific way: **when a student is confused at 2am watching a recording, there's no one to ask.** Office hours are asynchronous, forums are slow, and generic chatbots don't know what the student has actually watched or where they are in the material.
@@ -38,17 +38,6 @@ The result is a self-contained web application that takes a video from **upload 
 | **Video processing** | OpenCV for first-frame thumbnail extraction | Avoids re-encoding video just to generate a library preview image |
 
 **Data flow:** upload → GridFS blob storage → background transcription → timestamped transcript stored in MongoDB → client queries against the current video timestamp → LLM response rendered back into the UI.
-
----
-
-## Conclusion
-
-### Next Steps
-1. **Timestamp-scoped context retrieval** — filter transcript segments to the student's current playhead window instead of sending the full transcript, cutting both token cost and latency.
-2. **Quantitative benchmarking** — publish transcription latency, Whisper WER, GPT-4o response latency, and token cost per query.
-3. **One-command local setup** (Docker Compose) — package Flask, MongoDB, and any background workers so the app runs with a single command.
-4. **Recover the background job queue** (Celery + Redis) — replace the current thread-per-upload approach with a proper worker queue for reliability under concurrent load.
-5. **Wire up LLM output validation** — enforce structured JSON output on MCQ generation with server-side validation and fallback handling.
 
 ---
 
