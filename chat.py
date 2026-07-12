@@ -1,4 +1,4 @@
-from Transcribe import transcribe
+from transcribe import transcribe
 from openai import OpenAI
 from dotenv import load_dotenv
 import os
