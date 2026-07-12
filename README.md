@@ -24,8 +24,7 @@ The result is a self-contained web application that takes a video from **upload 
 
 ### Diagram
 
-![System Architecture Diagram](unflipped_architecture_diagram.webp)
-🚧 = in progress — see [Unfinished Features](#unfinished-features) below.
+![System Architecture Diagram](unflipped_architecture_diagram.png)
 
 ### Architecture Breakdown & Design Choices
 
@@ -42,15 +41,13 @@ The result is a self-contained web application that takes a video from **upload 
 
 ### Key Components & Quantitative Results
 
-| Component | Status | Notes |
-|---|---|---|
-| Video ingestion (GridFS) | ✅ Implemented | Unified blob storage alongside transcript metadata |
-| Background transcription pipeline | ✅ Implemented | Threaded worker + status polling endpoint |
-| Timestamp-aware Q&A (GPT-4o) | ✅ Implemented | Full transcript currently sent per query — see roadmap |
-| MCQ generation (GPT-3.5-turbo) | ✅ Implemented | Transcript segmented by time window before generation |
-| Thumbnail extraction (OpenCV) | ✅ Implemented | Cached via `Cache-Control` headers |
-| Timestamp-scoped retrieval (RAG) | 🚧 In progress | Will replace full-transcript prompting with a segment-window filter |
-| Benchmarking suite (latency, WER, token cost) | 🚧 In progress | No quantitative metrics published yet — see roadmap |
+| Component | Notes |
+|---|---|
+| Video ingestion (GridFS) | Unified blob storage alongside transcript metadata |
+| Background transcription pipeline | Threaded worker + status polling endpoint |
+| Timestamp-aware Q&A (GPT-4o) | Full transcript currently sent per query — see roadmap |
+| MCQ generation (GPT-3.5-turbo) | Transcript segmented by time window before generation |
+| Thumbnail extraction (OpenCV) | Cached via `Cache-Control` headers |
 
 ---
 
@@ -63,15 +60,6 @@ The result is a self-contained web application that takes a video from **upload 
 4. **Recover the background job queue** (Celery + Redis) — replace the current thread-per-upload approach with a proper worker queue for reliability under concurrent load.
 5. **Wire up LLM output validation** — enforce structured JSON output on MCQ generation with server-side validation and fallback handling.
 
-### Unfinished Features
-The following are scoped and partially started, but not yet complete:
-- 🚧 **Timestamp-scoped retrieval (RAG)** — currently the full transcript is sent on every query rather than a relevant window
-- 🚧 **Authentication** — login/signup UI exists, but backend verification is not yet wired up
-- 🚧 **Task queue (Celery + Redis)** — background transcription currently runs on a simple thread; a queue-based version is in progress
-- 🚧 **Automated testing & CI** — no test suite or CI pipeline yet
-- 🚧 **Containerized setup** — no Docker Compose configuration yet; local setup is manual
-- 🚧 **Structured logging & job status tracking** — currently relies on basic console output
-
 ---
 
-*UnFlipped was built by Drew, Surya, and Aryan at Emory Hacks 2025.*
+*UnFlipped was built by Andrew Eckhart, Surya Parupalli, and Aryan Thakur at Emory Hacks 2025.*
