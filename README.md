@@ -39,16 +39,6 @@ The result is a self-contained web application that takes a video from **upload 
 
 **Data flow:** upload → GridFS blob storage → background transcription → timestamped transcript stored in MongoDB → client queries against the current video timestamp → LLM response rendered back into the UI.
 
-### Key Components & Quantitative Results
-
-| Component | Notes |
-|---|---|
-| Video ingestion (GridFS) | Unified blob storage alongside transcript metadata |
-| Background transcription pipeline | Threaded worker + status polling endpoint |
-| Timestamp-aware Q&A (GPT-4o) | Full transcript currently sent per query — see roadmap |
-| MCQ generation (GPT-3.5-turbo) | Transcript segmented by time window before generation |
-| Thumbnail extraction (OpenCV) | Cached via `Cache-Control` headers |
-
 ---
 
 ## Conclusion
