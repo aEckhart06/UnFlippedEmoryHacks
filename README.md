@@ -24,7 +24,7 @@ The result is a self-contained web application that takes a video from **upload 
 
 ### Diagram
 
-[System Architecture Diagram](unflipped architecture diagram.webp)
+[System Architecture Diagram](unflipped_architecture_diagram.webp)
 🚧 = in progress — see [Unfinished Features](#unfinished-features) below.
 
 ### Architecture Breakdown & Design Choices
