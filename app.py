@@ -10,11 +10,11 @@ import numpy as np
 import io
 import tempfile
 import os
-from Chat import call_model
-from Transcribe import transcribe
+from chat import call_model
+from transcribe import transcribe
 from datetime import datetime
 import threading
-from GenerateQuestions import generate_mcq, ask_question, split_transcript_by_time
+from generate_questions import generate_mcq, ask_question, split_transcript_by_time
 from functools import wraps
 
 
